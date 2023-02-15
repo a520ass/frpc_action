@@ -1,6 +1,8 @@
 # Frp client Action
 
-frpc of https://github.com/fatedier/frp to forward any port from/to GitHub Actions Runners machines
+use frpc to forward any port from/to GitHub Actions Runners machines. ex. fallback to expose ssh server port for debugging
+
+see https://github.com/fatedier/frp
 
 frpc xtcp uses UDP to establish a P2P connection between clients, even behind NAT, which may achieve better throughput than any "proxy" technology such as Cloudflare Tunnel/ngrok/tmate/upterm
 
