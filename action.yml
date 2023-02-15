@@ -1,5 +1,5 @@
 name: "Frp client"
-description: "frpc of https://github.com/fatedier/frp to forward port from/to GitHub Actions workflow Runners machines"
+description: "use frpc to forward any port from/to GitHub Actions Runners machines. ex. fallback to expose ssh server port for debugging"
 branding:
   icon: 'arrow-up-right'  
   color: 'blue'
