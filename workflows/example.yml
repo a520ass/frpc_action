@@ -1,0 +1,23 @@
+name: Example
+permissions:
+  contents: read
+on:
+  workflow_dispatch:
+    inputs:
+      users:
+        type: string
+jobs:
+  fallback_to_frpc_ssh_for_debugging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: "echo step 1"
+      - run: "echo step 2 failed; false"
+      - run: "echo step 3"
+      - name: start frpc
+        if: failure()
+        uses: douniwan5788/frpc_action@main
+        with:
+          users: ${{ inputs.users || github.actor }}
+          host_key: ${{ secrets.HOST_KEY }}
+          config: ${{ vars.FRPC_SERVER_CONF }}

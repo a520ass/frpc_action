@@ -1,0 +1,42 @@
+name: "Frp client"
+description: "frpc of https://github.com/fatedier/frp to forward port from/to GitHub Actions workflow Runners machines"
+inputs:
+  config:
+    description: frpc config
+    required: true
+  users:
+    description: "If only the public SSH keys of the listed GitHub users should be authorized.(default: the user who triggering workflow)"
+    required: false
+    default: ${{ github.triggering_actor }}
+  host_key:
+    description: setup server host key to this fixed private key
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: init
+      shell: bash
+      run: |
+        sudo bash -c "apt-get update && apt-get install -y htop socat knockd"
+    - name: setup ssh host key
+      if: ${{ inputs.host_key != '' }}
+      shell: bash
+      run: |
+        echo '${{ inputs.host_key }}' | sudo install -m 600 /dev/stdin /etc/ssh/ssh_host_key
+        echo "HostKey /etc/ssh/ssh_host_key" | sudo tee -a /etc/ssh/sshd_config
+        sudo service ssh restart
+    - name: setup ssh pubkey
+      shell: bash
+      run: |
+        mkdir -m 700 -p ~/.ssh
+        for user in $( sed 's/[,/s]/ /g' <(echo ${{ inputs.users }}) ); do (echo \#$user:; curl -f "https://github.com/$user.keys" || true) >> ~/.ssh/authorized_keys; done
+    - name: setup fprc
+      shell: bash
+      run: |
+        wget https://github.com/fatedier/frp/releases/download/v0.47.0/frp_0.47.0_linux_amd64.tar.gz
+        tar xvf frp_0.47.0_linux_amd64.tar.gz
+        echo '${{ inputs.config }}' > frpc_server.ini
+    - name: start fprc
+      shell: bash
+      run: frp_0.47.0_linux_amd64/frpc -c frpc_server.ini
