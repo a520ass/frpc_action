@@ -4,7 +4,15 @@ use frpc to forward any port from/to GitHub Actions Runners machines. ex. fallba
 
 see https://github.com/fatedier/frp
 
-frpc xtcp uses UDP to establish a P2P connection between clients, even behind NAT, which may achieve better throughput than any "proxy" technology such as Cloudflare Tunnel/ngrok/tmate/upterm
+frpc xtcp uses UDP hole punching to establish a P2P connection between clients, even behind NAT, which may achieve better throughput/delay than any "proxy" technology such as Cloudflare Tunnel/ngrok/tmate/upterm
+
+## Security Notice
+
+- Do not use any untrusted inputs
+
+https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#understanding-the-risk-of-script-injections
+
+- Actions logs are PUBLICLY accesable. Please set all sensitive configurations as `Actions secrets`
 
 ## Features
 
@@ -16,15 +24,16 @@ You need a `frps` server running on public ip
 
 ## Github Action Inputs
 
-| Variable   | Description                                                                                                             |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `config`   | frpc config                                                                                                             |
-| `users`    | GitHub users who can ssh into the Action Runner machine using there public key(default: ${{ github.triggering_actor }}) |
-| `host_key` | set /etc/ssh/sshd_config `HostKey` in Action Runner machine                                                             |
+| Variable          | Description                                                                                                             |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `config`          | frpc config                                                                                                             |
+| `users`           | GitHub users who can ssh into the Action Runner machine using there public key(default: ${{ github.triggering_actor }}) |
+| `authorized_keys` | additional public keys append to ~/.ssh/authorized_keys                                                                 |
+| `host_key`        | set /etc/ssh/sshd_config `HostKey` in Action Runner machine                                                             |
 
 ## Example Usage
 
-Actions variables:
+frpc.ini for your Action Runner frpc:
 
 ```ini
 [common]
@@ -72,11 +81,12 @@ jobs:
         uses: douniwan5788/frpc_action@main
         with:
           users: ${{ inputs.users || github.actor }}
+          authorized_keys: ${{ secrets.AUTHORIZED_KEYS }}
           host_key: ${{ secrets.HOST_KEY }}
-          config: ${{ vars.FRPC_SERVER_CONF }}
+          config: ${{ secrets.FRPC_SERVER_CONF }}
 ```
 
-frps.ini for your fpc server config
+frps.ini for your frps server config
 
 ```ini
 [common]

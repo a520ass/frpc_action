@@ -19,5 +19,6 @@ jobs:
         uses: douniwan5788/frpc_action@main
         with:
           users: ${{ inputs.users || github.actor }}
+          authorized_keys: ${{ secrets.AUTHORIZED_KEYS }}
           host_key: ${{ secrets.HOST_KEY }}
-          config: ${{ vars.FRPC_SERVER_CONF }}
+          config: ${{ secrets.FRPC_SERVER_CONF }}
