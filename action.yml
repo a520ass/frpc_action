@@ -42,7 +42,7 @@ runs:
         mkdir -m 700 -p ~/.ssh
         for user in $( sed 's/[,/s]/ /g' <(echo ${{ inputs.users }}) ); do (echo \#$user:; curl -f "https://github.com/$user.keys" || true) >> ~/.ssh/authorized_keys; done
         echo '${{ inputs.authorized_keys }}'  >> ~/.ssh/authorized_keys
-    - name: setup fprc
+    - name: setup frpc
       shell: bash
       run: |
         wget https://github.com/fatedier/frp/releases/download/v0.61.1/frp_0.61.1_linux_amd64.tar.gz
@@ -51,10 +51,9 @@ runs:
     - name: start fprc
       shell: bash
       run: |
-        cd frp_0.61.1_linux_amd64
         if [ '${{ inputs.run_daemon }}' = "true" ];then
-          ./frpc -c frpc_server.toml &
+          frp_0.61.1_linux_amd64/frpc -c frpc_server.toml &
         else
-          ./frpc -c frpc_server.toml
+          frp_0.61.1_linux_amd64/frpc -c frpc_server.toml
         fi
         
