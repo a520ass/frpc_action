@@ -46,7 +46,7 @@ runs:
       shell: bash
       run: |
         wget https://github.com/fatedier/frp/releases/download/v0.61.1/frp_0.61.1_linux_amd64.tar.gz
-        tar xvf frp_0.61.1_linux_amd64.tar.gz
+        tar -xf frp_0.61.1_linux_amd64.tar.gz
         echo '${{ inputs.config }}' > frpc_server.toml
     - name: start fprc
       shell: bash
