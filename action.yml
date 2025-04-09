@@ -17,6 +17,10 @@ inputs:
   host_key:
     description: setup server host key to this fixed private key
     required: false
+  run_daemon:
+    description: run in the background
+    required: false 
+    default: false
 
 runs:
   using: "composite"
@@ -46,4 +50,11 @@ runs:
         echo '${{ inputs.config }}' > frpc_server.toml
     - name: start fprc
       shell: bash
-      run: frp_0.61.1_linux_amd64/frpc -c frpc_server.toml
+      run: |
+        cd frp_0.61.1_linux_amd64
+        if [ '${{ inputs.run_daemon }}' = "true" ];then
+          ./frpc -c frpc_server.toml &
+        else
+          ./frpc -c frpc_server.toml
+        fi
+        
